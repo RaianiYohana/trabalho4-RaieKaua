@@ -136,7 +136,7 @@ export default function App() {
                 <View style={styles.botao}>
                     <Button color={'#205e53'} title="Enviar Respostas" onPress={enviarRespostas} />
                 </View>
-                <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
+                <Button color={'#205e53'} title="Trocar Quiz" onPress={() => setTela("selecionarPais")} />
 
             </View>
         );
