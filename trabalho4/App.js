@@ -7,27 +7,27 @@ export default function App() {
     const [latitude, setLatitude] = useState(0.0);
     const [longitude, setLongitude] = useState(0.0);
     const [pais, setPais] = useState("");
-    const [screen, setScreen] = useState("home");
-    const [selectedCountry, setSelectedCountry] = useState(null);
-    const [questions, setQuestions] = useState([]);
-    const [answers, setAnswers] = useState({});
-    const [result, setResult] = useState(null);
+    const [tela, setTela] = useState("inicial");
+    const [paisSelecionado, setPaisSelecionado] = useState(null);
+    const [perguntas, setPerguntas] = useState([]);
+    const [respostas, setRespostas] = useState({});
+    const [resultado, setResultado] = useState(null);
 
-    const countriesWithQuestions = {
-        "Brazil": [
-            { question: "Qual é a capital do Brasil?", options: ["São Paulo", "Rio de Janeiro", "Brasília"], answer: "Brasília" },
-            { question: "Qual é o idioma oficial do Brasil?", options: ["Espanhol", "Português", "Inglês"], answer: "Português" },
-            { question: "Qual é o maior rio do Brasil?", options: ["Rio Amazonas", "Rio São Francisco", "Rio Paraná"], answer: "Rio Amazonas" }
+    const perguntasPorPais = {
+        "Tuvalu": [
+            { pergunta: "Qual é a capital de Tuvalu?", opcoes: ["Funafuti", "Vaitupu", "Nanumanga"], resposta: "Funafuti" },
+            { pergunta: "Qual é a população estimada de Tuvalu?", opcoes: ["Aproximadamente 11.000", "Aproximadamente 25.000", "Aproximadamente 50.000"], resposta: "Aproximadamente 11.000" },
+            { pergunta: "Em que oceano Tuvalu está localizado?", opcoes: ["Oceano Índico", "Oceano Atlântico", "Oceano Pacífico"], resposta: "Oceano Pacífico" }
         ],
-        "USA": [
-            { question: "Qual é a capital dos EUA?", options: ["Nova York", "Washington, D.C.", "Los Angeles"], answer: "Washington, D.C." },
-            { question: "Qual é a moeda dos EUA?", options: ["Euro", "Dólar", "Libra"], answer: "Dólar" },
-            { question: "Qual é o monumento famoso em Nova York?", options: ["Estátua da Liberdade", "Big Ben", "Torre Eiffel"], answer: "Estátua da Liberdade" }
+        "Comores": [
+            { pergunta: "Qual é a capital das Comores?", opcoes: ["Moroni", "Mutsamudu", "Fomboni"], resposta: "Moroni" },
+            { pergunta: "Qual é a principal língua falada nas Comores?", opcoes: ["Comoriano", "Francês", "Árabe"], resposta: "Comoriano, Francês, Árabe" },
+            { pergunta: "Onde as Comores estão localizadas?", opcoes: ["Oceano Pacífico", "Oceano Atlântico", "Oceano Índico"], resposta: "Oceano Índico" }
         ],
-        "Japan": [
-            { question: "Qual é a capital do Japão?", options: ["Osaka", "Tóquio", "Kyoto"], answer: "Tóquio" },
-            { question: "Qual é a montanha mais alta do Japão?", options: ["Monte Fuji", "Monte Everest", "Monte Kilimanjaro"], answer: "Monte Fuji" },
-            { question: "Qual é a moeda do Japão?", options: ["Yuan", "Iene", "Dólar"], answer: "Iene" }
+        "São Tomé e Príncipe": [
+            { pergunta: "Qual é a capital de São Tomé e Príncipe?", opcoes: ["São Tomé", "Príncipe", "Porto Alegre"], resposta: "São Tomé" },
+            { pergunta: "Qual é a língua oficial de São Tomé e Príncipe?", opcoes: ["Inglês", "Português", "Francês"], resposta: "Português" },
+            { pergunta: "São Tomé e Príncipe fica em que região do mundo?", opcoes: ["Ásia", "África", "América do Sul"], resposta: "África" }
         ]
     };
 
@@ -35,106 +35,112 @@ export default function App() {
         const buscarPais = async (latitude, longitude) => {
             const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
             try {
-                const response = await axios.get(url, {
-                    headers: { 'User-Agent': 'YourAppName/1.0' }
+                const resposta = await axios.get(url, {
+                    headers: { 'User-Agent': 'SeuApp/1.0' }
                 });
-                const address = response.data.address;
-                if (address && address.country) {
-                    return address.country;
+                const endereco = resposta.data.address;
+                if (endereco && endereco.country) {
+                    return endereco.country;
                 }
-            } catch (error) {
-                console.error(error);
+            } catch (erro) {
+                console.error(erro);
             }
             return null;
         };
 
-        const buscarCoordendadas = async () => {
+        const buscarCoordenadas = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
                 return;
             }
 
-            let location = await Location.getCurrentPositionAsync({});
-            const lat = location.coords.latitude;
-            const long = location.coords.longitude;
+            let localizacao = await Location.getCurrentPositionAsync({});
+            const lat = localizacao.coords.latitude;
+            const long = localizacao.coords.longitude;
 
             setLatitude(lat);
             setLongitude(long);
             setPais(await buscarPais(lat, long));
         };
 
-        buscarCoordendadas();
+        buscarCoordenadas();
     }, []);
 
-    const startQuiz = (country) => {
-        setSelectedCountry(country);
-        setQuestions(countriesWithQuestions[country]);
-        setAnswers({});
-        setScreen("quiz");
+    const iniciarQuiz = (pais) => {
+        setPaisSelecionado(pais);
+        setPerguntas(perguntasPorPais[pais]);
+        setRespostas({});
+        setTela("quiz");
     };
 
-    const submitAnswers = () => {
-        let correctAnswers = 0;
-        questions.forEach((q, index) => {
-            if (answers[index] === q.answer) {
-                correctAnswers++;
+    const enviarRespostas = () => {
+        let acertos = 0;
+        perguntas.forEach((p, indice) => {
+            if (respostas[indice] === p.resposta) {
+                acertos++;
             }
         });
-        setResult(correctAnswers);
-        setScreen("result");
+        setResultado(acertos);
+        setTela("resultado");
     };
 
-    if (screen === "home") {
+    if (tela === "inicial") {
         return (
             <View style={styles.container}>
-                <Text>Bem-vindo!</Text>
-                <Text>{pais ? `Você está no país: ${pais}` : "Carregando..."}</Text>
-                <Button title="Iniciar Quiz" onPress={() => setScreen("selectCountry")} />
+                <Text style={styles.paragraph} >Geolocalização</Text>
+                <Text style={styles.t2} >{pais ? `Você está no país: ${pais}` : "Carregando..."}</Text>
+                <View style={styles.botao}>
+                    <Button color={'#205e53'} title="Iniciar Quiz" onPress={() => setTela("selecionarPais")} />
+                </View>
             </View>
         );
     }
 
-    if (screen === "selectCountry") {
+    if (tela === "selecionarPais") {
         return (
             <View style={styles.container}>
-                <Text>Selecione seu país para começar o quiz:</Text>
-                {Object.keys(countriesWithQuestions).map(country => (
-                    <Button key={country} title={country} onPress={() => startQuiz(country)} />
+                <Text style={styles.t3}  >Escolha seu primeiro Quiz</Text>
+                {Object.keys(perguntasPorPais).map(pais => (
+                    <View style={styles.botao}>
+                        <Button color={'#205e53'} key={pais} title={pais} onPress={() => iniciarQuiz(pais)} />
+                    </View>
                 ))}
+                <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
             </View>
         );
     }
 
-    if (screen === "quiz") {
+    if (tela === "quiz") {
         return (
             <View style={styles.container}>
                 <FlatList
-                    data={questions}
+                    data={perguntas}
                     renderItem={({ item, index }) => (
                         <View>
-                            <Text>{item.question}</Text>
-                            {item.options.map((option, i) => (
+                            <Text style={styles.t4}  >{item.pergunta}</Text>
+                            {item.opcoes.map((opcao, i) => (
+
                                 <Button
                                     key={i}
-                                    title={option}
-                                    onPress={() => setAnswers({ ...answers, [index]: option })}
-                                    color={answers[index] === option ? 'green' : 'gray'}
+                                    title={opcao}
+                                    onPress={() => setRespostas({ ...respostas, [index]: opcao })}
+                                    color={respostas[index] === opcao ? 'green' : 'gray'}
                                 />
                             ))}
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
                 />
-                <Button title="Enviar Respostas" onPress={submitAnswers} />
+                <Button title="Enviar Respostas" onPress={enviarRespostas} />
             </View>
         );
     }
 
-    if (screen === "result") {
+    if (tela === "resultado") {
         return (
             <View style={styles.container}>
-                <Text>Você acertou {result} de {questions.length} perguntas!</Text>
-                <Button title="Voltar ao Início" onPress={() => setScreen("home")} />
+                <Text>Você acertou {resultado} de {perguntas.length} perguntas!</Text>
+                <Button title="Voltar ao Início" onPress={() => setTela("inicial")} />
             </View>
         );
     }
@@ -147,6 +153,40 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
+        padding: 5,
+        backgroundColor: '#d6f7f2'
+    },
+    paragraph: {
+        fontSize: 35,
+        textAlign: 'center',
+        color: '#205e53'
+
+    },
+    t2: {
+        fontSize: 20,
+        color: '#205e53',
+
+    },
+    t3: {
+        fontSize: 30,
+        color: '#205e53',
+
+    },
+    t4: {
+        marginTop: 80,
+        marginBottom: 5,
+        fontSize: 25,
+        textAlign:'center',
+        color: '#205e53',
+
+    },
+    botao: {
+        marginTop: 10,
+        width: 300,
+        height: 50,
+
     }
+
+
+
 });
