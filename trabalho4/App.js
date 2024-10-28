@@ -119,19 +119,25 @@ export default function App() {
                         <View>
                             <Text style={styles.t4}  >{item.pergunta}</Text>
                             {item.opcoes.map((opcao, i) => (
+                                <View style={styles.resposta}>
 
-                                <Button
-                                    key={i}
-                                    title={opcao}
-                                    onPress={() => setRespostas({ ...respostas, [index]: opcao })}
-                                    color={respostas[index] === opcao ? 'green' : 'gray'}
-                                />
+                                    <Button
+                                        key={i}
+                                        title={opcao}
+                                        onPress={() => setRespostas({ ...respostas, [index]: opcao })}
+                                        color={respostas[index] === opcao ? '#205e53' : '#54988c'}
+                                    />
+                                </View>
                             ))}
                         </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
                 />
-                <Button title="Enviar Respostas" onPress={enviarRespostas} />
+                <View style={styles.botao}>
+                    <Button color={'#205e53'} title="Enviar Respostas" onPress={enviarRespostas} />
+                </View>
+                <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
+
             </View>
         );
     }
@@ -139,8 +145,10 @@ export default function App() {
     if (tela === "resultado") {
         return (
             <View style={styles.container}>
-                <Text>Você acertou {resultado} de {perguntas.length} perguntas!</Text>
-                <Button title="Voltar ao Início" onPress={() => setTela("inicial")} />
+                <Text style={styles.t4}>Você acertou {resultado} de {perguntas.length} perguntas!</Text>
+                <View style={styles.botao}>
+                    <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
+                </View>
             </View>
         );
     }
@@ -173,11 +181,15 @@ const styles = StyleSheet.create({
 
     },
     t4: {
-        marginTop: 80,
-        marginBottom: 5,
-        fontSize: 25,
-        textAlign:'center',
+        marginTop: 65,
+        fontSize: 20,
+        textAlign: 'center',
         color: '#205e53',
+
+    },
+    resposta: {
+        marginTop: 10,
+        textAlign: 'center',
 
     },
     botao: {
