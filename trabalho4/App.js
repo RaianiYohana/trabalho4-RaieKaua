@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button, FlatList } from 'react-native';
 import * as Location from 'expo-location';
 import axios from 'axios';
 
 export default function App() {
-    const [latitude, setLatitude] = useState(0.0);
-    const [longitude, setLongitude] = useState(0.0);
     const [pais, setPais] = useState("");
     const [tela, setTela] = useState("inicial");
     const [paisSelecionado, setPaisSelecionado] = useState(null);
@@ -58,8 +56,6 @@ export default function App() {
             const lat = localizacao.coords.latitude;
             const long = localizacao.coords.longitude;
 
-            setLatitude(lat);
-            setLongitude(long);
             setPais(await buscarPais(lat, long));
         };
 
@@ -87,10 +83,20 @@ export default function App() {
     if (tela === "inicial") {
         return (
             <View style={styles.container}>
-                <Text style={styles.paragraph} >Geolocalização</Text>
-                <Text style={styles.t2} >{pais ? `Você está no país: ${pais}` : "Carregando..."}</Text>
+                <Text style={styles.paragraph}>Geolocalização</Text>
+                <Text style={styles.t2}>{pais ? `Você está no país: ${pais}` : "Carregando..."}</Text>
                 <View style={styles.botao}>
-                    <Button color={'#205e53'} title="Iniciar Quiz" onPress={() => setTela("selecionarPais")} />
+                    <Button
+                        color={'#205e53'}
+                        title="Iniciar Quiz"
+                        onPress={() => {
+                            if (perguntasPorPais[pais]) {
+                                setTela("selecionarPais");
+                            } else {
+                                alert("Desculpe, o quiz não está disponível para seu país.");
+                            }
+                        }}
+                    />
                 </View>
             </View>
         );
@@ -99,10 +105,10 @@ export default function App() {
     if (tela === "selecionarPais") {
         return (
             <View style={styles.container}>
-                <Text style={styles.t3}  >Escolha seu primeiro Quiz</Text>
+                <Text style={styles.t3}>Escolha seu primeiro Quiz</Text>
                 {Object.keys(perguntasPorPais).map(pais => (
-                    <View style={styles.botao}>
-                        <Button color={'#205e53'} key={pais} title={pais} onPress={() => iniciarQuiz(pais)} />
+                    <View style={styles.botao} key={pais}>
+                        <Button color={'#205e53'} title={pais} onPress={() => iniciarQuiz(pais)} />
                     </View>
                 ))}
                 <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
@@ -116,13 +122,11 @@ export default function App() {
                 <FlatList
                     data={perguntas}
                     renderItem={({ item, index }) => (
-                        <View>
-                            <Text style={styles.t4}  >{item.pergunta}</Text>
+                        <View key={index}>
+                            <Text style={styles.t4}>{item.pergunta}</Text>
                             {item.opcoes.map((opcao, i) => (
-                                <View style={styles.resposta}>
-
+                                <View style={styles.resposta} key={i}>
                                     <Button
-                                        key={i}
                                         title={opcao}
                                         onPress={() => setRespostas({ ...respostas, [index]: opcao })}
                                         color={respostas[index] === opcao ? '#205e53' : '#54988c'}
@@ -137,7 +141,6 @@ export default function App() {
                     <Button color={'#205e53'} title="Enviar Respostas" onPress={enviarRespostas} />
                 </View>
                 <Button color={'#205e53'} title="Trocar Quiz" onPress={() => setTela("selecionarPais")} />
-
             </View>
         );
     }
@@ -168,37 +171,28 @@ const styles = StyleSheet.create({
         fontSize: 35,
         textAlign: 'center',
         color: '#205e53'
-
     },
     t2: {
         fontSize: 20,
         color: '#205e53',
-
     },
     t3: {
         fontSize: 30,
         color: '#205e53',
-
     },
     t4: {
         marginTop: 65,
         fontSize: 20,
         textAlign: 'center',
         color: '#205e53',
-
     },
     resposta: {
         marginTop: 10,
         textAlign: 'center',
-
     },
     botao: {
         marginTop: 10,
         width: 300,
         height: 50,
-
     }
-
-
-
 });
