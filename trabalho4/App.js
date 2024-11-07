@@ -9,6 +9,7 @@ export default function App() {
     const [perguntas, setPerguntas] = useState([]);
     const [respostas, setRespostas] = useState({});
     const [resultado, setResultado] = useState(null);
+    const [perguntasErradas, setPerguntasErradas] = useState([]);
 
     const perguntasPorPais = {
         "Tuvalu": [
@@ -67,12 +68,18 @@ export default function App() {
 
     const enviarRespostas = () => {
         let acertos = 0;
+        let erradas = [];
+
         perguntas.forEach((p, indice) => {
             if (respostas[indice] === p.resposta) {
                 acertos++;
+            } else {
+                erradas.push(p);
             }
         });
+
         setResultado(acertos);
+        setPerguntasErradas(erradas);
         setTela("resultado");
     };
 
@@ -129,7 +136,25 @@ export default function App() {
     if (tela === "resultado") {
         return (
             <View style={styles.container}>
-                <Text style={styles.t4}>Você acertou {resultado} de {perguntas.length} perguntas!</Text>
+
+                {perguntasErradas.length > 0 && (
+                    <View style={styles.container}>
+                        <Text style={styles.t6}>Perguntas incorretas</Text>
+                        <FlatList
+                            data={perguntasErradas}
+                            renderItem={({ item }) => (
+                                <View style={styles.container}>
+                                    <Text style={styles.t4}>{item.pergunta}</Text>
+                                    <Text style={styles.t2}>Resposta Certa: {item.resposta}</Text>
+                                </View>
+                            )}
+                            keyExtractor={(item, index) => index.toString()}
+                        />
+                    </View>
+                )}
+                <Text style={styles.t5}>Você acertou {resultado} de {perguntas.length} perguntas</Text>
+
+
                 <View style={styles.botao}>
                     <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
                 </View>
@@ -154,22 +179,37 @@ const styles = StyleSheet.create({
         color: '#205e53'
     },
     t2: {
-        fontSize: 20,
-        color: '#205e53',
+        padding:5,
+        fontSize: 19,
+        color: '#0000 ',
     },
     t4: {
-        marginTop: 65,
-        fontSize: 20,
+        marginTop: 50,
+        fontSize: 22,
         textAlign: 'center',
         color: '#205e53',
     },
+    t5: {
+        fontSize: 22,
+        textAlign: 'center',
+        color: '#205e53',
+        marginBottom:30,
+    },
+    t6: {
+        marginTop: '50%',
+        fontSize: 26,
+        textAlign: 'center',
+        color: '#205e53',
+        fontWeight: '700',
+    },
     resposta: {
-        marginTop: 10,
+        marginTop: 20,
         textAlign: 'center',
     },
     botao: {
-        marginTop: 10,
+        marginTop: 5,
         width: 300,
+        marginBottom: 20,
         height: 50,
     }
 });
