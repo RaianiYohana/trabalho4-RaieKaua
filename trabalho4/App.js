@@ -19,7 +19,7 @@ export default function App() {
         ],
         "Comores": [
             { pergunta: "Qual é a capital das Comores?", opcoes: ["Moroni", "Mutsamudu", "Fomboni"], resposta: "Moroni" },
-            { pergunta: "Qual é a principal língua falada nas Comores?", opcoes: ["Comoriano", "Francês", "Árabe"], resposta: "Comoriano, Francês, Árabe" },
+            { pergunta: "As Comores são conhecidas pela exportação de qual especiaria?", opcoes: ["Canela", "Cravo-da-índia", "Baunilha"], resposta: "Baunilha" },
             { pergunta: "Onde as Comores estão localizadas?", opcoes: ["Oceano Pacífico", "Oceano Atlântico", "Oceano Índico"], resposta: "Oceano Índico" }
         ],
         "São Tomé e Príncipe": [
@@ -38,7 +38,11 @@ export default function App() {
                 });
                 const endereco = resposta.data.address;
                 if (endereco && endereco.country) {
-                    return endereco.country;
+                    let paisObtido = endereco.country;
+                    if (paisObtido.includes("Comores") || paisObtido.includes("Komori") || paisObtido.includes("جزر القمر")) {
+                        paisObtido = "Comores";
+                    }
+                    return paisObtido;
                 }
             } catch (erro) {
                 console.error(erro);
@@ -136,7 +140,6 @@ export default function App() {
     if (tela === "resultado") {
         return (
             <View style={styles.container}>
-
                 {perguntasErradas.length > 0 && (
                     <View style={styles.container}>
                         <Text style={styles.t6}>Perguntas incorretas</Text>
@@ -153,7 +156,6 @@ export default function App() {
                     </View>
                 )}
                 <Text style={styles.t5}>Você acertou {resultado} de {perguntas.length} perguntas</Text>
-
 
                 <View style={styles.botao}>
                     <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
@@ -179,7 +181,7 @@ const styles = StyleSheet.create({
         color: '#205e53'
     },
     t2: {
-        padding:5,
+        padding: 5,
         fontSize: 19,
         color: '#0000 ',
     },
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
         fontSize: 22,
         textAlign: 'center',
         color: '#205e53',
-        marginBottom:30,
+        marginBottom: 30,
     },
     t6: {
         marginTop: '50%',
