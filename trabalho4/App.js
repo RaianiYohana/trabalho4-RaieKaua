@@ -6,7 +6,6 @@ import axios from 'axios';
 export default function App() {
     const [pais, setPais] = useState("");
     const [tela, setTela] = useState("inicial");
-    const [paisSelecionado, setPaisSelecionado] = useState(null);
     const [perguntas, setPerguntas] = useState([]);
     const [respostas, setRespostas] = useState({});
     const [resultado, setResultado] = useState(null);
@@ -56,18 +55,15 @@ export default function App() {
             const lat = localizacao.coords.latitude;
             const long = localizacao.coords.longitude;
 
-            setPais(await buscarPais(lat, long));
+            const paisAtual = await buscarPais(lat, long);
+            setPais(paisAtual);
+            if (perguntasPorPais[paisAtual]) {
+                setPerguntas(perguntasPorPais[paisAtual]);
+            }
         };
 
         buscarCoordenadas();
     }, []);
-
-    const iniciarQuiz = (pais) => {
-        setPaisSelecionado(pais);
-        setPerguntas(perguntasPorPais[pais]);
-        setRespostas({});
-        setTela("quiz");
-    };
 
     const enviarRespostas = () => {
         let acertos = 0;
@@ -90,28 +86,14 @@ export default function App() {
                         color={'#205e53'}
                         title="Iniciar Quiz"
                         onPress={() => {
-                            if (perguntasPorPais[pais]) {
-                                setTela("selecionarPais");
+                            if (perguntas.length > 0) {
+                                setTela("quiz");
                             } else {
                                 alert("Desculpe, o quiz não está disponível para seu país.");
                             }
                         }}
                     />
                 </View>
-            </View>
-        );
-    }
-
-    if (tela === "selecionarPais") {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.t3}>Escolha seu primeiro Quiz</Text>
-                {Object.keys(perguntasPorPais).map(pais => (
-                    <View style={styles.botao} key={pais}>
-                        <Button color={'#205e53'} title={pais} onPress={() => iniciarQuiz(pais)} />
-                    </View>
-                ))}
-                <Button color={'#205e53'} title="Voltar ao Início" onPress={() => setTela("inicial")} />
             </View>
         );
     }
@@ -140,7 +122,6 @@ export default function App() {
                 <View style={styles.botao}>
                     <Button color={'#205e53'} title="Enviar Respostas" onPress={enviarRespostas} />
                 </View>
-                <Button color={'#205e53'} title="Trocar Quiz" onPress={() => setTela("selecionarPais")} />
             </View>
         );
     }
@@ -174,10 +155,6 @@ const styles = StyleSheet.create({
     },
     t2: {
         fontSize: 20,
-        color: '#205e53',
-    },
-    t3: {
-        fontSize: 30,
         color: '#205e53',
     },
     t4: {
