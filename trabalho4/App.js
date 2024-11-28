@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     t2: {
         padding: 5,
         fontSize: 19,
-        color: '#0000 ',
+        color: ' rgb(0,0,0) ',
     },
     t4: {
         marginTop: 50,
