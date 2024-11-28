@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     paragraph: {
         fontSize: 35,
         textAlign: 'center',
-        color: '#205e53'
+        color: '#205e53',
     },
     t2: {
         padding: 5,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
         marginTop: '50%',
         fontSize: 26,
         textAlign: 'center',
-        color: '#205e53',
+        color: '#205e53' ,
         fontWeight: '700',
     },
     resposta: {
